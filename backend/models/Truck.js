@@ -25,17 +25,3 @@ const truckSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Truck', truckSchema);
-    required: true,
-  },
-  model: {
-    type: String,
-    required: true,
-  },
-  year: {
-    type: Number,
-  },
-}, {
-  timestamps: true,
-});
-
-module.exports = mongoose.model('Truck', truckSchema);

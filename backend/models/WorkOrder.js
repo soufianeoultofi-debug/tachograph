@@ -23,11 +23,3 @@ const workOrderSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('WorkOrder', workOrderSchema);
-  completionDate: {
-    type: Date,
-  },
-}, {
-  timestamps: true,
-});
-
-module.exports = mongoose.model('WorkOrder', workOrderSchema);

@@ -22,21 +22,3 @@ const certificateSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('CalibrationCertificate', certificateSchema);
-  },
-  status: {
-    type: String,
-    enum: ['Valid', 'Expired'],
-    default: 'Valid',
-  },
-}, {
-  timestamps: true,
-});
-
-certificateSchema.pre('save', function (next) {
-  if (this.expirationDate < Date.now()) {
-    this.status = 'Expired';
-  }
-  next();
-});
-
-module.exports = mongoose.model('CalibrationCertificate', certificateSchema);
