@@ -11,7 +11,7 @@ export default function Users() {
   const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState({ name: "", email: "", role: "technician", password: "" });
   const [saving, setSaving] = useState(false);
-  const API = process.env.REACT_APP_API || "http://localhost:5000/api";
+  const API = process.env.REACT_APP_API || "https://tachograph.onrender.com/api";
 
   useEffect(() => {
     const loadUsers = async () => {

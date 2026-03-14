@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useAuth } from "./AuthContext";
 
 const DataContext = createContext();
-const API = process.env.REACT_APP_API || "http://localhost:5000/api";
+const API = process.env.REACT_APP_API || "https://tachograph.onrender.com/api";
 
 export function useData() {
   return useContext(DataContext);

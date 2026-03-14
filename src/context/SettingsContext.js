@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const SettingsContext = createContext();
-const API = process.env.REACT_APP_API || "http://localhost:5000/api";
+const API = process.env.REACT_APP_API || "https://tachograph.onrender.com/api";
 
 export function useSettings() {
   return useContext(SettingsContext);

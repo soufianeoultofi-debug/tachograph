@@ -4,7 +4,7 @@ import { useSettings } from "../context/SettingsContext";
 
 export default function Settings() {
   const { darkMode, toggleDarkMode, language, changeLanguage, t, loaded } = useSettings();
-  const API = process.env.REACT_APP_API || "http://localhost:5000/api";
+  const API = process.env.REACT_APP_API || "https://tachograph.onrender.com/api";
   const [preferences, setPreferences] = useState({
     emailNotif: true,
     pushNotif: true,
