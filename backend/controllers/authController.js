@@ -45,8 +45,13 @@ exports.login = asyncHandler(async (req, res) => {
     throw new Error('Please provide an email and password');
   }
 
-  // Check for user
-  const user = await User.findOne({ email }).select('+password');
+  // Check for user by email or username (name)
+  const user = await User.findOne({
+    $or: [
+      { email },
+      { name: email },
+    ],
+  }).select('+password');
 
   if (!user) {
     res.status(401);
