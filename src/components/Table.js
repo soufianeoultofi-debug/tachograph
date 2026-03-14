@@ -71,7 +71,7 @@ function Table({
                       <div className="flex items-center justify-end gap-1">
                         {onEdit && (
                           <button
-                            onClick={() => onEdit(i, row)}
+                            onClick={(e) => { console.log('Table: edit click', i); onEdit(i, row, e); }}
                             className="p-2 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
                             title="Modifier"
                           >
@@ -80,7 +80,7 @@ function Table({
                         )}
                         {onDelete && (
                           <button
-                            onClick={() => onDelete(i, row)}
+                            onClick={(e) => { console.log('Table: delete click', i); onDelete(i, row, e); }}
                             className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                             title="Supprimer"
                           >

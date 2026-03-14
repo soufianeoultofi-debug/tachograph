@@ -20,11 +20,13 @@ export default function Clients() {
   const columns = clients.length > 0 ? Object.keys(clients[0]).filter(k => k !== "_id") : [];
 
   const handleEdit = (index) => {
+    console.log('Clients: handleEdit', index, clients[index]);
     setEditIndex(index);
     setShowModal(true);
   };
 
   const handleDelete = (index) => {
+    console.log('Clients: handleDelete', index, clients[index]);
     if (window.confirm("Êtes-vous sûr?")) {
       deleteClient(index);
     }
