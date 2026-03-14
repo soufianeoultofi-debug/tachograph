@@ -1,38 +1,52 @@
 const asyncHandler = require('express-async-handler');
-const { getPool } = require('../config/db');
+const Invoice = require('../models/Invoice');
 
 exports.getInvoices = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [rows] = await pool.query('SELECT * FROM invoices ORDER BY id DESC');
-  res.json(rows);
+  const invoices = await Invoice.find().sort('-createdAt');
+  res.json(invoices);
 });
 
 exports.createInvoice = asyncHandler(async (req, res) => {
   const { numero, client, camion, montant, statut } = req.body;
-  const pool = getPool();
-  const [result] = await pool.query(
-    'INSERT INTO invoices (numero, client, camion, montant, statut) VALUES (?, ?, ?, ?, ?)',
-    [numero, client, camion, montant, statut || 'Pending']
-  );
-  const [rows] = await pool.query('SELECT * FROM invoices WHERE id = ?', [result.insertId]);
-  res.status(201).json(rows[0]);
+
+  const invoice = await Invoice.create({
+    numero,
+    client,
+    camion,
+    montant,
+    statut: statut || 'Pending',
+  });
+
+  res.status(201).json(invoice);
 });
 
 exports.updateInvoice = asyncHandler(async (req, res) => {
+  let invoice = await Invoice.findById(req.params.id);
+
+  if (!invoice) {
+    res.status(404);
+    throw new Error('Invoice not found');
+  }
+
   const { numero, client, camion, montant, statut } = req.body;
-  const pool = getPool();
-  await pool.query(
-    'UPDATE invoices SET numero=?, client=?, camion=?, montant=?, statut=? WHERE id=?',
-    [numero, client, camion, montant, statut, req.params.id]
-  );
-  const [rows] = await pool.query('SELECT * FROM invoices WHERE id = ?', [req.params.id]);
-  if (rows.length === 0) { res.status(404); throw new Error('Invoice not found'); }
-  res.json(rows[0]);
+
+  if (numero) invoice.numero = numero;
+  if (client) invoice.client = client;
+  if (camion) invoice.camion = camion;
+  if (montant) invoice.montant = montant;
+  if (statut) invoice.statut = statut;
+
+  invoice = await invoice.save();
+  res.json(invoice);
 });
 
 exports.deleteInvoice = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [result] = await pool.query('DELETE FROM invoices WHERE id = ?', [req.params.id]);
-  if (result.affectedRows === 0) { res.status(404); throw new Error('Invoice not found'); }
+  const invoice = await Invoice.findByIdAndDelete(req.params.id);
+
+  if (!invoice) {
+    res.status(404);
+    throw new Error('Invoice not found');
+  }
+
   res.json({ message: 'Invoice removed' });
 });

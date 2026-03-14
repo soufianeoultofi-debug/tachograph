@@ -1,23 +1,25 @@
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
-  name: {
+  nom: {
     type: String,
     required: [true, 'Client name is required'],
   },
   email: {
     type: String,
-    required: [true, 'Client email is required'],
     match: [/.+@.+\..+/, 'Please add a valid email'],
   },
-  phone: {
+  telephone: {
     type: String,
   },
-  address: {
+  entreprise: {
     type: String,
   },
 }, {
   timestamps: true,
+});
+
+module.exports = mongoose.model('Client', clientSchema);
 });
 
 module.exports = mongoose.model('Client', clientSchema);

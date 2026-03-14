@@ -1,23 +1,27 @@
 const mongoose = require('mongoose');
 
 const certificateSchema = new mongoose.Schema({
-  workOrder: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'WorkOrder',
-    required: true,
-  },
-  certificateNumber: {
+  cert_id: {
     type: String,
-    required: true,
     unique: true,
   },
-  issueDate: {
-    type: Date,
-    required: true,
+  client: {
+    type: String,
   },
-  expirationDate: {
+  truck: {
+    type: String,
+  },
+  date_issued: {
     type: Date,
-    required: true,
+  },
+  expiration: {
+    type: Date,
+  },
+}, {
+  timestamps: true,
+});
+
+module.exports = mongoose.model('CalibrationCertificate', certificateSchema);
   },
   status: {
     type: String,

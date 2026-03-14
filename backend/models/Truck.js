@@ -1,18 +1,30 @@
 const mongoose = require('mongoose');
 
 const truckSchema = new mongoose.Schema({
-  client: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client',
-    required: true,
-  },
-  plateNumber: {
+  numero: {
     type: String,
-    required: [true, 'Plate number is required'],
+    required: true,
     unique: true,
   },
-  brand: {
+  vin: {
     type: String,
+  },
+  client: {
+    type: String,
+  },
+  appareil: {
+    type: String,
+  },
+  statut: {
+    type: String,
+    enum: ['Active', 'Inactive', 'Maintenance'],
+    default: 'Active',
+  },
+}, {
+  timestamps: true,
+});
+
+module.exports = mongoose.model('Truck', truckSchema);
     required: true,
   },
   model: {

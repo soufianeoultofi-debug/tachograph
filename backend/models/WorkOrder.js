@@ -1,23 +1,28 @@
 const mongoose = require('mongoose');
 
 const workOrderSchema = new mongoose.Schema({
-  truck: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Truck',
-    required: true,
+  camion: {
+    type: String,
   },
-  status: {
+  client: {
+    type: String,
+  },
+  service: {
+    type: String,
+  },
+  technicien: {
+    type: String,
+  },
+  statut: {
     type: String,
     enum: ['Pending', 'In Progress', 'Completed'],
     default: 'Pending',
   },
-  price: {
-    type: Number,
-    default: 0,
-  },
-  description: {
-    type: String,
-  },
+}, {
+  timestamps: true,
+});
+
+module.exports = mongoose.model('WorkOrder', workOrderSchema);
   completionDate: {
     type: Date,
   },

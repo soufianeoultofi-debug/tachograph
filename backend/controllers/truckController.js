@@ -1,38 +1,52 @@
 const asyncHandler = require('express-async-handler');
-const { getPool } = require('../config/db');
+const Truck = require('../models/Truck');
 
 exports.getTrucks = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [rows] = await pool.query('SELECT * FROM trucks ORDER BY id DESC');
-  res.json(rows);
+  const trucks = await Truck.find().sort('-createdAt');
+  res.json(trucks);
 });
 
 exports.createTruck = asyncHandler(async (req, res) => {
   const { numero, vin, client, appareil, statut } = req.body;
-  const pool = getPool();
-  const [result] = await pool.query(
-    'INSERT INTO trucks (numero, vin, client, appareil, statut) VALUES (?, ?, ?, ?, ?)',
-    [numero, vin, client, appareil, statut || 'Active']
-  );
-  const [rows] = await pool.query('SELECT * FROM trucks WHERE id = ?', [result.insertId]);
-  res.status(201).json(rows[0]);
+
+  const truck = await Truck.create({
+    numero,
+    vin,
+    client,
+    appareil,
+    statut: statut || 'Active',
+  });
+
+  res.status(201).json(truck);
 });
 
 exports.updateTruck = asyncHandler(async (req, res) => {
+  let truck = await Truck.findById(req.params.id);
+
+  if (!truck) {
+    res.status(404);
+    throw new Error('Truck not found');
+  }
+
   const { numero, vin, client, appareil, statut } = req.body;
-  const pool = getPool();
-  await pool.query(
-    'UPDATE trucks SET numero=?, vin=?, client=?, appareil=?, statut=? WHERE id=?',
-    [numero, vin, client, appareil, statut, req.params.id]
-  );
-  const [rows] = await pool.query('SELECT * FROM trucks WHERE id = ?', [req.params.id]);
-  if (rows.length === 0) { res.status(404); throw new Error('Truck not found'); }
-  res.json(rows[0]);
+
+  if (numero) truck.numero = numero;
+  if (vin) truck.vin = vin;
+  if (client) truck.client = client;
+  if (appareil) truck.appareil = appareil;
+  if (statut) truck.statut = statut;
+
+  truck = await truck.save();
+  res.json(truck);
 });
 
 exports.deleteTruck = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [result] = await pool.query('DELETE FROM trucks WHERE id = ?', [req.params.id]);
-  if (result.affectedRows === 0) { res.status(404); throw new Error('Truck not found'); }
+  const truck = await Truck.findByIdAndDelete(req.params.id);
+
+  if (!truck) {
+    res.status(404);
+    throw new Error('Truck not found');
+  }
+
   res.json({ message: 'Truck removed' });
 });

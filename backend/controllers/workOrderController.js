@@ -1,38 +1,52 @@
 const asyncHandler = require('express-async-handler');
-const { getPool } = require('../config/db');
+const WorkOrder = require('../models/WorkOrder');
 
 exports.getWorkOrders = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [rows] = await pool.query('SELECT * FROM work_orders ORDER BY id DESC');
-  res.json(rows);
+  const workOrders = await WorkOrder.find().sort('-createdAt');
+  res.json(workOrders);
 });
 
 exports.createWorkOrder = asyncHandler(async (req, res) => {
   const { camion, client, service, technicien, statut } = req.body;
-  const pool = getPool();
-  const [result] = await pool.query(
-    'INSERT INTO work_orders (camion, client, service, technicien, statut) VALUES (?, ?, ?, ?, ?)',
-    [camion, client, service, technicien, statut || 'Pending']
-  );
-  const [rows] = await pool.query('SELECT * FROM work_orders WHERE id = ?', [result.insertId]);
-  res.status(201).json(rows[0]);
+
+  const workOrder = await WorkOrder.create({
+    camion,
+    client,
+    service,
+    technicien,
+    statut: statut || 'Pending',
+  });
+
+  res.status(201).json(workOrder);
 });
 
 exports.updateWorkOrder = asyncHandler(async (req, res) => {
+  let workOrder = await WorkOrder.findById(req.params.id);
+
+  if (!workOrder) {
+    res.status(404);
+    throw new Error('Work order not found');
+  }
+
   const { camion, client, service, technicien, statut } = req.body;
-  const pool = getPool();
-  await pool.query(
-    'UPDATE work_orders SET camion=?, client=?, service=?, technicien=?, statut=? WHERE id=?',
-    [camion, client, service, technicien, statut, req.params.id]
-  );
-  const [rows] = await pool.query('SELECT * FROM work_orders WHERE id = ?', [req.params.id]);
-  if (rows.length === 0) { res.status(404); throw new Error('Work order not found'); }
-  res.json(rows[0]);
+
+  if (camion) workOrder.camion = camion;
+  if (client) workOrder.client = client;
+  if (service) workOrder.service = service;
+  if (technicien) workOrder.technicien = technicien;
+  if (statut) workOrder.statut = statut;
+
+  workOrder = await workOrder.save();
+  res.json(workOrder);
 });
 
 exports.deleteWorkOrder = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const [result] = await pool.query('DELETE FROM work_orders WHERE id = ?', [req.params.id]);
-  if (result.affectedRows === 0) { res.status(404); throw new Error('Work order not found'); }
+  const workOrder = await WorkOrder.findByIdAndDelete(req.params.id);
+
+  if (!workOrder) {
+    res.status(404);
+    throw new Error('Work order not found');
+  }
+
   res.json({ message: 'Work order removed' });
 });
