@@ -37,7 +37,6 @@ export function DataProvider({ children }) {
       opts.headers.Authorization = `Bearer ${token}`;
     }
     if (body) opts.body = JSON.stringify(body);
-    console.log(`API Call: ${method} ${url}`);
     const res = await fetch(url, opts);
     if (!res.ok) {
       const errorText = await res.text();
@@ -45,7 +44,6 @@ export function DataProvider({ children }) {
       throw new Error(errorText || `API error: ${res.status}`);
     }
     const data = await res.json();
-    console.log(`API Success: ${url}`, data);
     return data;
   }, [token]);
   const [clients, setClients] = useState([]);
@@ -83,25 +81,19 @@ export function DataProvider({ children }) {
   }, [api]);
 
   const addClient = useCallback(async (item) => {
-    console.log('DataContext: addClient', item);
     const row = await api(`${API}/clients`, "POST", clientToDB(item));
-    console.log('DataContext: addClient response', row);
     setClients((prev) => [clientToDisplay(row), ...prev]);
   }, [api]);
   const updateClient = useCallback(async (index, updated) => {
     const id = clients[index]?._id;
     if (!id) return;
-    console.log('DataContext: updateClient', index, id, updated);
     const row = await api(`${API}/clients/${id}`, "PUT", clientToDB(updated));
-    console.log('DataContext: updateClient response', row);
     setClients((prev) => prev.map((c, i) => (i === index ? clientToDisplay(row) : c)));
   }, [api, clients]);
   const deleteClient = useCallback(async (index) => {
     const id = clients[index]?._id;
     if (!id) return;
-    console.log('DataContext: deleteClient', index, id);
     await api(`${API}/clients/${id}`, "DELETE");
-    console.log('DataContext: deleteClient response OK');
     setClients((prev) => prev.filter((_, i) => i !== index));
   }, [api, clients]);
 

@@ -14,15 +14,7 @@ function FormModal({ title, fields = [], initialData = {}, onSave, onClose, icon
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      console.log('FormModal: submit', formData);
-      const res = onSave(formData);
-      if (res && res.then) {
-        res.then(() => console.log('FormModal: onSave resolved')).catch(err => console.error('FormModal: onSave error', err));
-      }
-    } catch (err) {
-      console.error('FormModal: submit error', err);
-    }
+    onSave(formData);
   };
 
   return (
