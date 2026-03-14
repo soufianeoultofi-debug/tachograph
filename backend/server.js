@@ -13,6 +13,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Health check for uptime monitors
+app.get('/health', (req, res) => {
+  return res.status(200).json({ status: 'ok' });
+});
+
 // routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/clients', require('./routes/clientRoutes'));

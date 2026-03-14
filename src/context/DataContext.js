@@ -8,19 +8,19 @@ export function useData() {
   return useContext(DataContext);
 }
 
-const clientToDisplay = (r) => ({ _id: r.id, Nom: r.nom, Téléphone: r.telephone, Entreprise: r.entreprise, Email: r.email });
+const clientToDisplay = (r) => ({ _id: r._id || r.id, Nom: r.nom, Téléphone: r.telephone, Entreprise: r.entreprise, Email: r.email });
 const clientToDB = (d) => ({ nom: d.Nom, telephone: d["Téléphone"], entreprise: d.Entreprise, email: d.Email });
 
-const truckToDisplay = (r) => ({ _id: r.id, "N° Camion": r.numero, VIN: r.vin, Client: r.client, Appareil: r.appareil, Statut: r.statut });
+const truckToDisplay = (r) => ({ _id: r._id || r.id, "N° Camion": r.numero, VIN: r.vin, Client: r.client, Appareil: r.appareil, Statut: r.statut });
 const truckToDB = (d) => ({ numero: d["N° Camion"], vin: d.VIN, client: d.Client, appareil: d.Appareil, statut: d.Statut });
 
-const woToDisplay = (r) => ({ _id: r.id, Camion: r.camion, Client: r.client, Service: r.service, Technicien: r.technicien, Statut: r.statut });
+const woToDisplay = (r) => ({ _id: r._id || r.id, Camion: r.camion, Client: r.client, Service: r.service, Technicien: r.technicien, Statut: r.statut });
 const woToDB = (d) => ({ camion: d.Camion, client: d.Client, service: d.Service, technicien: d.Technicien, statut: d.Statut });
 
-const invToDisplay = (r) => ({ _id: r.id, "N° Facture": r.numero, Client: r.client, Camion: r.camion, Montant: r.montant, Statut: r.statut });
+const invToDisplay = (r) => ({ _id: r._id || r.id, "N° Facture": r.numero, Client: r.client, Camion: r.camion, Montant: r.montant, Statut: r.statut });
 const invToDB = (d) => ({ numero: d["N° Facture"], client: d.Client, camion: d.Camion, montant: d.Montant, statut: d.Statut });
 
-const certToDisplay = (r) => ({ _id: r.id, id: r.cert_id, client: r.client, truck: r.truck, date: r.date_issued, expiration: r.expiration });
+const certToDisplay = (r) => ({ _id: r._id || r.id, id: r.cert_id, client: r.client, truck: r.truck, date: r.date_issued, expiration: r.expiration });
 const certToDB = (d) => ({ cert_id: d.id, client: d.client, truck: d.truck, date_issued: d.date, expiration: d.expiration });
 
 const notifToDisplay = (r) => ({ id: r.id, text: r.text_content, time: r.time_label, read: !!r.is_read, type: r.type });
@@ -83,19 +83,25 @@ export function DataProvider({ children }) {
   }, [api]);
 
   const addClient = useCallback(async (item) => {
+    console.log('DataContext: addClient', item);
     const row = await api(`${API}/clients`, "POST", clientToDB(item));
+    console.log('DataContext: addClient response', row);
     setClients((prev) => [clientToDisplay(row), ...prev]);
   }, [api]);
   const updateClient = useCallback(async (index, updated) => {
     const id = clients[index]?._id;
     if (!id) return;
+    console.log('DataContext: updateClient', index, id, updated);
     const row = await api(`${API}/clients/${id}`, "PUT", clientToDB(updated));
+    console.log('DataContext: updateClient response', row);
     setClients((prev) => prev.map((c, i) => (i === index ? clientToDisplay(row) : c)));
   }, [api, clients]);
   const deleteClient = useCallback(async (index) => {
     const id = clients[index]?._id;
     if (!id) return;
+    console.log('DataContext: deleteClient', index, id);
     await api(`${API}/clients/${id}`, "DELETE");
+    console.log('DataContext: deleteClient response OK');
     setClients((prev) => prev.filter((_, i) => i !== index));
   }, [api, clients]);
 
