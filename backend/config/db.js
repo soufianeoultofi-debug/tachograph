@@ -1,53 +1,21 @@
-const mysql = require('mysql2/promise');
-
-let pool;
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    pool = mysql.createPool({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'tachograph_db',
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
+    const conn = await mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/tachograph_db', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
 
-    // test connection
-    const conn = await pool.getConnection();
-    console.log(`MySQL Connected: ${conn.config.host}`);
-    conn.release();
-
-    // create tables if they don't exist
-    await createTables();
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    return conn;
   } catch (error) {
-    console.error(`MySQL Error: ${error.message}`);
+    console.error(`MongoDB Error: ${error.message}`);
     process.exit(1);
   }
 };
 
-const createTables = async () => {
-  const queries = [
-    `CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      role ENUM('admin','technician') DEFAULT 'technician',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )`,
-    `CREATE TABLE IF NOT EXISTS clients (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      nom VARCHAR(255) NOT NULL,
-      telephone VARCHAR(50),
-      entreprise VARCHAR(255),
-      email VARCHAR(255),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )`,
-    `CREATE TABLE IF NOT EXISTS trucks (
+module.exports = { connectDB };
       id INT AUTO_INCREMENT PRIMARY KEY,
       numero VARCHAR(100) NOT NULL,
       vin VARCHAR(255),
